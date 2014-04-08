@@ -1,191 +1,425 @@
+" vimrc
+" Copyright 2013 Doug Ireton
+
+" Licensed under the Apache License, Version 2.0 (the "License");
+" you may not use this file except in compliance with the License.
+" You may obtain a copy of the License at
+
+"     http://www.apache.org/licenses/LICENSE-2.0
+
+" Unless required by applicable law or agreed to in writing, software
+" distributed under the License is distributed on an "AS IS" BASIS,
+" WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+" See the License for the specific language governing permissions and
+" limitations under the License.
+
+" ----------------------------------------------------------------------------
+"  Vundle setup
+" ----------------------------------------------------------------------------
+filetype off 			" Required for Vundle
+
+set rtp+=~/.vim/bundle/vundle/	" Add vundle to the RuntimePath
+call vundle#rc()
+
+" Let Vundle manage Vundle. Required!
+Bundle 'gmarik/vundle'
+
+" Various editing plugins
+Bundle 'kana/vim-textobj-user'
+Bundle 'tpope/vim-repeat'
+Bundle 'tpope/vim-surround'
+Bundle 'tpope/vim-unimpaired'
+Bundle 'nelstrom/vim-visual-star-search'
+Bundle 'ZoomWin'
+Bundle 'ervandew/supertab'
+Bundle 'tpope/vim-endwise'
+Bundle 'godlygeek/tabular'
+Bundle 'HarnoRanaivo/vim-neatfoldtext'
+
+" Comment plugin
+Bundle 'tpope/vim-commentary'
+
+" File managers/explorers
+Bundle 'kien/ctrlp.vim'
+
+" Shell/OS integration plugins
+Bundle 'tpope/vim-dispatch'
+
+if executable('ack')
+  Bundle 'mileszs/ack.vim'
+endif
+
+if executable('ag')
+  Bundle 'rking/ag.vim'
+endif
+
+Bundle 'mhinz/vim-startify'
+Bundle 'chrisbra/Recover.vim'
+
+" Tmux plugins
+if executable('tmux')
+  Bundle 'christoomey/vim-tmux-navigator'
+  Bundle 'sjl/vitality.vim'
+endif
+
+" Buffer plugins
+Bundle 'moll/vim-bbye'
+
+" Status bar plugins
+Bundle 'bling/vim-airline'
+
+" Colorschemes
+Bundle 'altercation/vim-colors-solarized'
+Bundle 'endel/vim-github-colorscheme'
+
+" Ruby plugins
+Bundle 'nelstrom/vim-textobj-rubyblock'
+Bundle 'thoughtbot/vim-rspec'
+Bundle 'tpope/vim-bundler'
+Bundle 'tpope/vim-rake'
+Bundle 'vim-ruby/vim-ruby'
+
+" Chef plugins
+Bundle 'dougireton/vim-chef'
+
+" JSON plugins
+Bundle 'elzr/vim-json'
+
+" Markdown plugins
+Bundle 'tpope/vim-markdown'
+
+" PowerShell plugins
+Bundle 'dougireton/vim-ps1'
+
+" Wiki
+Bundle 'vimwiki'
+
+" Syntax check on buffer save
+Bundle 'scrooloose/syntastic'
+
+" Source Control plugins
+Bundle 'tpope/vim-git'
+Bundle 'tpope/vim-fugitive'
+Bundle 'gregsexton/gitv'
+Bundle 'mhinz/vim-signify'
+
+
+if has('autocmd')
+  filetype plugin indent on	  " Turn on Filetype detection, plugins, and
+                              " indent
+endif
+
+if has('syntax') && !exists('g:syntax_on')
+  syntax enable			" Turn on syntax highlighting
+endif
+
+" Load matchit.vim, but only if the user hasn't installed a newer version.
+if !exists('g:loaded_matchit') && findfile('plugin/matchit.vim', &rtp) ==# ''
+  runtime! macros/matchit.vim
+endif
+
+" load the man plugin for a nice man viewer
+runtime! ftplugin/man.vim
+
+" ----------------------------------------------------------------------------
+"  moving around, searching and patterns
+" ----------------------------------------------------------------------------
+set nostartofline     " keep cursor in same column for long-range motion cmds
+set incsearch			    " Highlight pattern matches as you type
+set ignorecase			  " ignore case when using a search pattern
+set smartcase			    " override 'ignorecase' when pattern has upper case
+                      " character
+
+" ----------------------------------------------------------------------------
+"  tags
+" ----------------------------------------------------------------------------
+
+" ----------------------------------------------------------------------------
+"  displaying text
+" ----------------------------------------------------------------------------
+set scrolloff=3       " number of screen lines to show around the cursor
+
+set linebreak			    " For lines longer than the window, wrap intelligently.
+                      " This doesn't insert hard line breaks.
+
+set showbreak=↪\ \ 		" string to put before wrapped screen lines
+
+set sidescrolloff=2		" min # of columns to keep left/right of cursor
+set display+=lastline " show last line, even if it doesn't fit in the window
+
+set cmdheight=2 		  " # of lines for the command window
+                      " cmdheight=2 helps avoid 'Press ENTER...' prompts
+
+" Define characters to show when you show formatting
+" stolen from https://github.com/tpope/vim-sensible
+if &listchars ==# 'eol:$'
+  set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
+  if &termencoding ==# 'utf-8' || &encoding ==# 'utf-8'
+    let &listchars = "tab:\u21e5 ,trail:\u2423,extends:\u21c9,precedes:\u21c7,nbsp:\u26ad"
+  endif
+endif
+
+set number			      " show line numbers
+
+" ----------------------------------------------------------------------------
+"  syntax, highlighting and spelling
+" ----------------------------------------------------------------------------
+set background=dark
+
+" ignore colorscheme doesn't exist error if solarized isn't installed
+silent! colorscheme solarized
+
+if exists('+colorcolumn')
+  set colorcolumn=80    " display a line in column 80 to show you
+                        " where to line break.
+endif
+
+" ----------------------------------------------------------------------------
+"  multiple windows
+" ----------------------------------------------------------------------------
+set laststatus=2  	  " Show a status line, even if there's only one
+                      " Vim window
+
+set hidden		    	  " allow switching away from current buffer w/o writing
+
+set switchbuf=usetab  " Jump to the 1st open window which contains
+                      " specified buffer, even if the buffer is in
+                      " another tab.
+                      " TODO: Add 'split' if you want to split the
+                      " current window for a quickfix error window.
+
+set statusline=
+set statusline+=b%-1.3n\ >                    " buffer number
+set statusline+=\ %{fugitive#statusline()}:
+set statusline+=\ %F
+set statusline+=\ %M
+set statusline+=%R
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+set statusline+=%=
+set statusline+=\ %Y
+set statusline+=\ <\ %{&fenc}
+set statusline+=\ <\ %{&ff}
+set statusline+=\ <\ %p%%
+set statusline+=\ %l:
+set statusline+=%02.3c   	" cursor line/total lines
+
+set helpheight=30         " Set window height when opening Vim help windows
+
+" ----------------------------------------------------------------------------
+"  multiple tab pages
+" ----------------------------------------------------------------------------
+
+" ----------------------------------------------------------------------------
+"  terminal
+" ----------------------------------------------------------------------------
+set ttyfast			      " this is the 21st century, people
+
+" ----------------------------------------------------------------------------
+"  using the mouse
+" ----------------------------------------------------------------------------
+
+" ----------------------------------------------------------------------------
+"  GUI				      " Set these options in .gvimrc
+" See help for 'setting-guifont' for tips on how to set guifont on Mac vs Windows
+" ----------------------------------------------------------------------------
+
+" ----------------------------------------------------------------------------
+"  printing
+" ----------------------------------------------------------------------------
+
+" ----------------------------------------------------------------------------
+"  messages and info
+" ----------------------------------------------------------------------------
+
+set showcmd			    " In the status bar, show incomplete commands
+                    " as they are typed
+
+set noshowmode      " don't display the current mode (Insert, Visual, Replace)
+                    " in the status line. This info is already shown in the
+                    " Airline status bar.
+
+set ruler			      " Always display the current cursor position in
+                    " the Status Bar
+
+set confirm         " Ask to save buffer instead of failing when executing
+                    " commands which close buffers
+
+" ----------------------------------------------------------------------------
+"  selecting text
+" ----------------------------------------------------------------------------
+
+set clipboard=unnamed	" Yank to the system clipboard by default
+
+" ----------------------------------------------------------------------------
+"  editing text
+" ----------------------------------------------------------------------------
+set backspace=indent,eol,start  "backspace over everything
+
+if v:version > 703 || v:version == 703 && has("patch541")
+  set formatoptions+=j 	  " delete comment char on second line when
+                          " joining two commented lines
+endif
+
+set showmatch  			      " when inserting a bracket, briefly jump to its
+                          " match
+
+set nojoinspaces	  	    " Use only one space after '.' when joining
+                          " lines, instead of two
+
+set completeopt+=longest 	" better omni-complete menu
+
+set nrformats-=octal      " don't treat numbers with leading zeros as octal
+                          " when incrementing/decrementing
+
+" ----------------------------------------------------------------------------
+"  tabs and indenting
+" ----------------------------------------------------------------------------
+set tabstop=2             " tab = 2 spaces
+set shiftwidth=2          " autoindent indents 2 spaces
+set smarttab              " <TAB> in front of line inserts 'shiftwidth' blanks
+set softtabstop=2
+set shiftround            " round to 'shiftwidth' for "<<" and ">>"
+set expandtab
+
+" ----------------------------------------------------------------------------
+"  folding
+" ----------------------------------------------------------------------------
+if has('folding')
+  set nofoldenable 		       " When opening files, all folds open by default
+endif
+
+set foldtext=NeatFoldText()  "Use a custom foldtext function
+
+" ----------------------------------------------------------------------------
+"  diff mode
+" ----------------------------------------------------------------------------
+set diffopt+=vertical       " start diff mode with vertical splits by default
+
+" ----------------------------------------------------------------------------
+"  mapping
+" ----------------------------------------------------------------------------
+
+" ----------------------------------------------------------------------------
+"  reading and writing files
+" ----------------------------------------------------------------------------
+set autoread			          " Automatically re-read files changed outside
+                            " of Vim
+
+" ----------------------------------------------------------------------------
+"  the swap file
+" ----------------------------------------------------------------------------
+
+" Set swap file, backup and undo directories to sensible locations
+" Taken from https://github.com/tpope/vim-sensible
+" The trailing double '//' on the filenames cause Vim to create undo, backup,
+" and swap filenames using the full path to the file, substituting '%' for
+" '/', e.g. '%Users%bob%foo.txt'
+let s:dir = has('win32') ? '$APPDATA/Vim' : match(system('uname'), "Darwin") > -1 ? '~/Library/Vim' : empty($XDG_DATA_HOME) ? '~/.local/share/vim' : '$XDG_DATA_HOME/vim'
+if isdirectory(expand(s:dir))
+  if &directory =~# '^\.,'
+    let &directory = expand(s:dir) . '/swap//,' . &directory
+  endif
+  if &backupdir =~# '^\.,'
+    let &backupdir = expand(s:dir) . '/backup//,' . &backupdir
+  endif
+  if exists('+undodir') && &undodir =~# '^\.\%(,\|$\)'
+    let &undodir = expand(s:dir) . '/undo//,' . &undodir
+  endif
+endif
+if exists('+undofile')
+  set undofile
+endif
+
+" ----------------------------------------------------------------------------
+"  command line editing
+" ----------------------------------------------------------------------------
+set history=200    " Save more commands in history
+                   " See Practical Vim, by Drew Neil, pg 68
+
+set wildmode=list:longest,full
+
+" File tab completion ignores these file patterns
+set wildignore+=*.exe,*.swp,.DS_Store
+set wildmenu
+
+" Add guard around 'wildignorecase' to prevent terminal vim error
+if exists('&wildignorecase')
+  set wildignorecase
+endif
+
+" ----------------------------------------------------------------------------
+"  executing external commands
+" ----------------------------------------------------------------------------
+
+if has("win32") || has("gui_win32")
+  if executable("PowerShell")
+    " Set PowerShell as the shell for running external ! commands
+    " http://stackoverflow.com/questions/7605917/system-with-powershell-in-vim
+    set shell=PowerShell
+    set shellcmdflag=-ExecutionPolicy\ RemoteSigned\ -Command
+    set shellquote=\"
+    " shellxquote must be a literal space character.
+    set shellxquote= 
+  endif
+endif
+
+" ----------------------------------------------------------------------------
+"  running make and jumping to errors
+" ----------------------------------------------------------------------------
+
+if executable('grep')
+  set grepprg=grep\ --line-number\ -rIH\ --exclude-dir=tmp\ --exclude-dir=.git\ --exclude=tags\ $*\ /dev/null
+endif
+
+" ----------------------------------------------------------------------------
+"  language specific
+" ----------------------------------------------------------------------------
+
+" ----------------------------------------------------------------------------
+"  multi-byte characters
+" ----------------------------------------------------------------------------
+set encoding=utf-8
+
+" ----------------------------------------------------------------------------
+"  various
+" ----------------------------------------------------------------------------
+set gdefault              " For :substitute, use the /g flag by default
+
+" ----------------------------------------------------------------------------
+" Autocmds
+" ----------------------------------------------------------------------------
+
+
+" When editing a file, always jump to the last known cursor position.
+" Don't do it for commit messages, when the position is invalid, or when
+" inside an event handler (happens when dropping a file on gvim).
+" From https://github.com/thoughtbot/dotfiles/blob/master/vimrc
+autocmd BufReadPost *
+  \ if &ft != 'gitcommit' && line("'\"") > 0 && line("'\"") <= line("$") |
+  \   exe "normal g`\"" |
+  \ endif
+
+" ----------------------------------------------------------------------------
+" Allow overriding these settings
+" ----------------------------------------------------------------------------
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif
+
+
+" ----------------------------------------------------------------------------
+" Don't make the background transparent 
+" ----------------------------------------------------------------------------
+"
+set t_ut=                    " Background colour erase
 set nocompatible                  " don't make vim vi-compatible (better)
-
 set modelines=0                   " prevent possible exploits in modelines
-
-" remap leader key too comma
-let mapleader=","
-
-set encoding=utf-8                " sets the character encoding used inside Vim
-
-set showcmd                       " display incomplete commands
-set showmode                      " display your current mode
-
 set backspace=indent,eol,start    " intuitive backspacing
-
-set hidden                        " handle multiple buffers better
-
 set wildmenu                      " enhanced command line completion
-set wildmode=list:longest         " complete files like a shell
-
-" use normal (perl-style) regext formatting
-nnoremap / /\v
-vnoremap / /\v
-set ignorecase                    " case insensitive matching
-set smartcase                     " turns case-sensitive if expression contains
-                                  " a capital letter
-set gdefault                      " :substitute flag 'g' is default on
-set incsearch                     " highlight matching as you type
-
-" clear out a search, remove highlighting
-nnoremap <leader><space> :noh<cr>
-
-set number                        " display line numbers
-set ruler                         " show cursor position
-
-set wrap                          " turn on line wrapping
-set scrolloff=3                   " show 3 lines of context around the cursor
-
-set title                         " set the terminal title
-
-set visualbell                    " no beeping
-
-set nobackup                       " don't make backup before overwriting file
-set nowritebackup                 " same again
-
 set directory=$HOME/.vim/tmp//,.  " keep swap files in one location"
-
-set tabstop=2                     " number of spaces that a <Tab> in the file
-                                  " counts for
-set shiftwidth=2                  " number of spaces to use for each step of
-                                  " (auto)indent
-set softtabstop=2                 " number of spaces that using <Tab> counts for
-set expandtab                     " use spaces instead of tabs
-
-set list                          " display unprintable characters
-
-" setting display chars for tab and eol
-set listchars=tab:>\ ,eol:~
-
-" ctrl+h: nav to left window
-nnoremap <C-h> <C-w>h
-" ctrl+j: nav to the window below
-nnoremap <C-j> <C-w>j
-" ctrl+k: nav to the window above
-nnoremap <C-k> <C-w>k
-" ctrl+l: nav to the right window
-nnoremap <C-l> <C-w>l
-" opens new vert split and switch over to it
-map <leader>w <C-w>v<C-w>l
-
-" map F2 to NERDTreeToggle (show/hide drawer)
-map <F2> :NERDTreeToggle<cr>
-
-" Strip trailing whitespace on lines
-map <leader>ws :%s/ *$//g<cr><c-o><cr>
-
-" Format JSON, thanks to:
-" http://blog.realnitro.be/2010/12/20/format-json-in-vim-using-pythons-jsontool-module/
-nmap <leader>js :%!python -m json.tool<cr>:%s/ \{4\}/  /<cr>:noh<cr>gg
-
-" Format XML
-nmap <leader>xml :%!xmllint --format -<cr>
-
-" Wrap selected lines to 75 char width
-nmap <leader>wl :!fmt -w 75<cr>
-
-" Replace insert pry breakpoint in insert mode
-imap !!p require 'pry' ; binding.pry
-
+set wildmode=list:longest         " complete files like a shell
 " Preserve selection after indentation
 vmap > >gv
 vmap < <gv
-
-" Map tab to indent in visual mode
-vmap <Tab> >gv
-vmap <S-Tab> <gv
-
-set laststatus=2                  " always show status line
-                                  " status line info at bottom of screen
-set statusline=[%n]\ %<%.99f\ %h%w%m%r%y\ %{exists('*CapsLockStatusline')?CapsLockStatusline():''}%=%-16(\ %l,%c-%v\ %)%P
-
-set background=dark               " blue on black background sucks
-
-if has("user_commands")
-  " Install vundle if not already installed
-  let VundleInstalled = 0
-
-  " Install Vundle if not installed
-  if !filereadable(expand('~/.vim/bundle/vundle/README.md'))
-    echo "Installing Vundle..."
-    echo ""
-    silent !mkdir -p ~/.vim/bundle
-    silent !git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-    let VundleInstalled=1
-  endif
-
-  " Load vundle"
-  filetype off
-  set runtimepath+=~/.vim/bundle/vundle/
-  call vundle#rc()
-
-  " Load bundles
-  if filereadable(expand('~/.vim/vundle.vim'))
-    source ~/.vim/vundle.vim
-  endif
-endif
-
-" Switch syntax highlighting on, when the terminal has colors
-" Also switch on highlighting the last used search pattern.
-if &t_Co > 2 || has("gui_running")
-  syntax on                       " turn on syntax highlighting
-  set hlsearch                    " highlights mactches
-endif
-
-if has("autocmd")
-  filetype plugin indent on       " turn on file type detection
-  "
-  " Restore cursor position
-  autocmd BufReadPost *
-    \ if line("'\"") > 1 && line("'\"") <= line("$") |
-    \   exe "normal! g`\"" |
-    \ endif
-
-  " Use gofmt on save for go files
-  autocmd FileType go autocmd BufWritePre <buffer> Fmt
-  " Set tab stops to 8 for go files
-  autocmd FileType go setlocal shiftwidth=8 tabstop=8 softtabstop=8
-  " Don't expand tabs to spaces for go files
-  autocmd FileType go setlocal noexpandtab
-endif
-
-let theme = 'base16-tomorrow'
-let theme_bundle = expand('~/.vim/bundle/base16-vim/colors/base16-tomorrow.vim')
-
-let vc_bundle = expand('~/.vim/bundle/vim-vividchalk/colors/vividchalk.vim')
-
-if v:version >= 600 && filereadable(vc_bundle)
-  " pathogen is not supported here, so colorscheme is found with symlink
-  " in colors/ to bundle/vim-vivdchalk/colors/
-  colorscheme vividchalk            " set color theme
-endif
-
-if v:version >= 700 && filereadable(theme_bundle)
-  " highlight extra whitespace
-  autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkred guibg=#C75D5D
-  " match trailing whitespace (except when typing)
-  autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-  autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-  autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-
-  " set color theme, can be found in colors or in a bundle
-  execute 'colorscheme ' . theme
-endif
-
-" enable extended % matching for HTML, LaTeX, and many other languages
-runtime macros/matchit.vim
-
-" Ctrl-P ignores
-let g:ctrlp_custom_ignore = '\v[\/](tmp|vendor/bundle|\.git)$'
-
-" Ctrl-P sets its local working directory the directory of the current file
-let g:ctrlp_working_path_mode = 'a'
-
-"
-" = References and Credits =
-" - [[http://stevelosh.com/blog/2010/09/coming-home-to-vim/]]
-" - [[http://vimcasts.org/episodes/tabs-and-spaces/]]
-" - [[http://github.com/rson/dotfiles/blob/master/vim/vimrc]]]
-" - [[http://vimcasts.org/episodes/running-vim-within-irb/]]
-" - [[http://rsontech.net/articles/2010/10/12/20/vim-plugin-management]]
-" - [[http://vim.wikia.com/wiki/Highlight_unwanted_spaces]]
-
